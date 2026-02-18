@@ -47,9 +47,71 @@
             }
         }
     </script>
+      <style>
+    /* From Uiverse.io by Nawsome */
+    .loader {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: row;
+    }
+
+    .slider {
+      overflow: hidden;
+      background-color: white;
+      margin: 0 15px;
+      height: 80px;
+      width: 20px;
+      border-radius: 30px;
+      box-shadow: 15px 15px 20px rgba(0, 0, 0, 0.1),
+                  -15px -15px 30px #fff,
+                  inset -5px -5px 10px rgba(0, 0, 255, 0.1),
+                  inset 5px 5px 10px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 20px;
+      width: 20px;
+      border-radius: 100%;
+      box-shadow: inset 0px 0px 0px rgba(0, 0, 0, 0.3),
+                  0px 420px 0 400px #2697f3,
+                  inset 0px 0px 0px rgba(0, 0, 0, 0.1);
+      animation: animate_2 2.5s ease-in-out infinite;
+      animation-delay: calc(-0.5s * var(--i));
+    }
+
+    @keyframes animate_2 {
+      0% {
+        transform: translateY(250px);
+        filter: hue-rotate(0deg);
+      }
+      50% {
+        transform: translateY(0);
+      }
+      100% {
+        transform: translateY(250px);
+        filter: hue-rotate(180deg);
+      }
+    }
+  </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300 font-sans">
+   <div id="loader-wrapper" style="display:none;">
+  <div class="loader">
+    <div class="slider" style="--i:0"></div>
+    <div class="slider" style="--i:1"></div>
+    <div class="slider" style="--i:2"></div>
+    <div class="slider" style="--i:3"></div>
+    <div class="slider" style="--i:4"></div>
+  </div>
+</div>
+
     <!-- LOGIN OVERLAY (FIRST SCREEN) -->
 <div id="login-screen" class="fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
 
@@ -110,8 +172,17 @@
 
         <!-- Loading Spinner -->
         <div id="login-loader" class="hidden absolute inset-0 bg-white/80 dark:bg-gray-900/80 flex items-center justify-center rounded-3xl">
-            <div class="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
+
+  <div class="loader">
+    <div class="slider" style="--i:0"></div>
+    <div class="slider" style="--i:1"></div>
+    <div class="slider" style="--i:2"></div>
+    <div class="slider" style="--i:3"></div>
+    <div class="slider" style="--i:4"></div>
+  </div>
+
+</div>
+
     </div>
 </div>
 <!-- REGISTER MODAL -->
@@ -177,8 +248,17 @@
 
         <!-- Loader -->
         <div id="register-loader" class="hidden absolute inset-0 bg-white/80 dark:bg-gray-900/80 flex items-center justify-center rounded-3xl">
-            <div class="w-12 h-12 border-4 border-secondary-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
+
+  <div class="loader">
+    <div class="slider" style="--i:0"></div>
+    <div class="slider" style="--i:1"></div>
+    <div class="slider" style="--i:2"></div>
+    <div class="slider" style="--i:3"></div>
+    <div class="slider" style="--i:4"></div>
+  </div>
+
+</div>
+
     </div>
 </div>
 <!-- FORGOT PASSWORD MODAL -->
@@ -219,8 +299,17 @@
 
         <!-- Loader -->
         <div id="forgot-loader" class="hidden absolute inset-0 bg-white/80 dark:bg-gray-900/80 flex items-center justify-center rounded-3xl">
-            <div class="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
+
+  <div class="loader">
+    <div class="slider" style="--i:0"></div>
+    <div class="slider" style="--i:1"></div>
+    <div class="slider" style="--i:2"></div>
+    <div class="slider" style="--i:3"></div>
+    <div class="slider" style="--i:4"></div>
+  </div>
+
+</div>
+
     </div>
 </div>
 
@@ -821,6 +910,22 @@ function sendResetLink() {
         success.classList.remove("hidden")
     }, 2000)
 }
+</script>
+ <script>
+  const loginForm = document.getElementById("loginForm");
+  const loader = document.getElementById("loader-wrapper");
+
+  loginForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    loader.style.display = "flex"; // show loader
+
+    setTimeout(() => {
+      loader.style.display = "none";
+      alert("Login successful!");
+      // window.location.href = "dashboard.html";
+    }, 2500);
+  });
 </script>
 
 
