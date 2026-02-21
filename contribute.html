@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Contribute — PsychoFlow</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}</style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <header class="p-6 border-b bg-white dark:bg-gray-800">
+        <div class="container mx-auto flex items-center justify-between">
+            <h1 class="text-xl font-bold">PsychoFlow</h1>
+            <nav class="space-x-4">
+                <a href="psych.html" class="text-sm text-gray-600 dark:text-gray-300 hover:underline">Home</a>
+                <a href="contribute.html" class="text-sm font-semibold text-primary-600">Contribute</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-6">
+        <section class="max-w-3xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-2xl shadow">
+            <h2 class="text-3xl font-bold mb-2">Support PsychoFlow</h2>
+            <p class="text-gray-600 dark:text-gray-300 mb-6">Choose a currency and the amount you'd like to donate. This page provides a preview — replace the final step with your payment gateway integration (Stripe, PayPal, etc.).</p>
+
+            <div id="processing-msg" class="hidden mb-4 p-3 rounded text-white bg-blue-600">Payment being processed</div>
+
+            <form id="donation-form" class="space-y-4" onsubmit="event.preventDefault(); processPayment();">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Currency</label>
+                    <select id="currency" class="w-full rounded-lg border px-3 py-2" onchange="updatePreview()">
+                        <option value="USD" selected>USD — US Dollar</option>
+                        <option value="EUR">EUR — Euro</option>
+                        <option value="GBP">GBP — British Pound</option>
+                        <option value="INR">INR — Indian Rupee</option>
+                        <option value="NGN">NGN — Nigerian Naira</option>
+                        <option value="KES">KES — Kenyan Shilling</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1">Amount</label>
+                    <input id="amount" type="number" step="0.01" min="1" class="w-full rounded-lg border px-3 py-2" placeholder="Enter amount" onchange="updatePreview()">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1">Payment method</label>
+                    <div class="flex flex-col gap-2">
+                        <label class="inline-flex items-center"><input type="radio" name="method" value="mpesa" checked class="mr-2"> M-Pesa (STK Push)</label>
+                        <label class="inline-flex items-center"><input type="radio" name="method" value="bank" class="mr-2"> Bank Transfer</label>
+                        <label class="inline-flex items-center"><input type="radio" name="method" value="paypal" class="mr-2"> PayPal</label>
+                    </div>
+                </div>
+
+                <div id="mpesa-section" class="space-y-2">
+                    <label class="block text-sm font-medium">Phone number (for M-Pesa STK Push)</label>
+                    <input id="mpesa-phone" type="tel" class="w-full rounded-lg border px-3 py-2" placeholder="e.g. 254712345678">
+                </div>
+
+                <div id="bank-section" class="hidden space-y-2">
+                    <p class="text-sm text-gray-600">Bank transfer instructions will appear here. Use the bank details below to complete your transfer.</p>
+                    <div class="p-3 rounded border bg-gray-50">
+                        <p class="text-sm font-semibold">Account: PsychoFlow</p>
+                        <p class="text-sm">Bank: Example Bank</p>
+                        <p class="text-sm">Account number: 123456789</p>
+                        <p class="text-sm">Swift: EXAMP123</p>
+                    </div>
+                </div>
+
+                <div id="paypal-section" class="hidden space-y-2">
+                    <p class="text-sm text-gray-600">You will be redirected to PayPal to complete the payment.</p>
+                </div>
+
+                <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Preview:</p>
+                    <p id="preview" class="text-lg font-semibold mt-1">—</p>
+                </div>
+
+                <div class="flex gap-3">
+                    <button id="complete-btn" type="button" class="px-6 py-3 bg-primary-600 text-white rounded-lg">Complete payment</button>
+                    <button id="pay-btn" type="button" class="px-6 py-3 border rounded-lg text-sm">Pay</button>
+                </div>
+            </form>
+
+            <p class="text-xs text-gray-500 mt-4">Note: This demo doesn't process payments. Implement `processPayment()` in the script below to call your payment provider.</p>
+        </section>
+    </main>
+
+    <script>
+        const rates = {
+            // static example rates relative to USD — replace with live rates if needed
+            USD: 1,
+            EUR: 0.92,
+            GBP: 0.79,
+            INR: 83.5,
+            NGN: 1550,
+            KES: 156
+        };
+
+        function setAmount(value){
+            const currency = document.getElementById('currency').value || 'USD';
+            // if USD selected show plain number, otherwise convert example display
+            document.getElementById('amount').value = value;
+            updatePreview();
+        }
+
+        function updatePreview(){
+            const cur = document.getElementById('currency').value;
+            const amt = parseFloat(document.getElementById('amount').value || '0');
+            if(!amt || amt <= 0){
+                document.getElementById('preview').textContent = 'Enter an amount to see preview.';
+                return;
+            }
+            const formatted = new Intl.NumberFormat(undefined, {style:'currency', currency: cur}).format(amt);
+            document.getElementById('preview').textContent = `${formatted}`;
+        }
+
+        // Toggle sections based on payment method
+        document.querySelectorAll('input[name="method"]').forEach(r => r.addEventListener('change', (e)=>{
+            const val = e.target.value;
+            document.getElementById('mpesa-section').classList.toggle('hidden', val !== 'mpesa');
+            document.getElementById('bank-section').classList.toggle('hidden', val !== 'bank');
+            document.getElementById('paypal-section').classList.toggle('hidden', val !== 'paypal');
+        }));
+
+        function setProcessing(on){
+            const el = document.getElementById('processing-msg');
+            const btn = document.getElementById('complete-btn');
+            const pay = document.getElementById('pay-btn');
+            if(on){
+                el.textContent = 'Payment being processed';
+                el.classList.remove('hidden');
+                btn.disabled = true; pay.disabled = true;
+                btn.classList.add('opacity-50','cursor-not-allowed');
+                pay.classList.add('opacity-50','cursor-not-allowed');
+            } else {
+                el.classList.add('hidden');
+                btn.disabled = false; pay.disabled = false;
+                btn.classList.remove('opacity-50','cursor-not-allowed');
+                pay.classList.remove('opacity-50','cursor-not-allowed');
+            }
+        }
+
+        document.getElementById('complete-btn').addEventListener('click', async ()=>{
+            const method = document.querySelector('input[name="method"]:checked').value;
+            const cur = document.getElementById('currency').value;
+            const amt = parseFloat(document.getElementById('amount').value || '0');
+            if(!amt || amt <= 0){ alert('Enter a valid amount'); return; }
+
+            // show processing
+            setProcessing(true);
+
+            if(method === 'mpesa'){
+                const phone = document.getElementById('mpesa-phone').value.trim();
+                if(!phone){ setProcessing(false); alert('Enter phone for M-Pesa STK Push'); return }
+                // call backend to initiate STK push
+                try{
+                    const res = await fetch('http://localhost:3000/api/mpesa/stkpush', {
+                        method:'POST', headers:{'Content-Type':'application/json'},
+                        body: JSON.stringify({ amount: amt, currency: cur, phone })
+                    });
+                    const json = await res.json();
+                    if(!res.ok){ setProcessing(false); return alert(json.error || 'MPesa error'); }
+                    alert('STK Push sent. Follow the payment prompt on your phone.');
+                    setProcessing(false);
+                }catch(e){ console.error(e); setProcessing(false); alert('Network error') }
+            }else if(method === 'bank'){
+                alert('Please follow the bank transfer instructions shown on the page.');
+                setProcessing(false);
+            }else if(method === 'paypal'){
+                // redirect to a placeholder PayPal flow (replace with real integration)
+                try{
+                    const res = await fetch('http://localhost:3000/api/paypal/create', {
+                        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ amount: amt, currency: cur })
+                    });
+                    const json = await res.json();
+                    if(json && json.approvalUrl){ window.location = json.approvalUrl; }
+                    else { setProcessing(false); alert('Could not create PayPal payment'); }
+                }catch(e){ console.error(e); setProcessing(false); alert('Network error') }
+            }
+        });
+
+        // Wire secondary Pay button to same action as Complete
+        document.getElementById('pay-btn').addEventListener('click', ()=>{
+            document.getElementById('complete-btn').click();
+        });
+    </script>
+</body>
+</html>

@@ -257,7 +257,7 @@
                     </p>
                     
                     <div class="flex flex-wrap gap-4">
-                        <a href="#contribute" class="px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white rounded-full font-semibold transition-all transform hover:scale-105 shadow-lg shadow-primary-500/30 flex items-center gap-2">
+                        <a href="contribute.html" class="px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white rounded-full font-semibold transition-all transform hover:scale-105 shadow-lg shadow-primary-500/30 flex items-center gap-2">
                             <i data-feather="gift" class="w-5 h-5"></i>
                             Contribute Now
                         </a>
@@ -372,7 +372,7 @@
                             <i data-feather="heart" class="w-7 h-7"></i>
                         </div>
                         <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">2. Contribute</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Donate sanitary pads or funds. $5 provides a month's supply for one woman. Every contribution counts.</p>
+                        <p class="text-gray-600 dark:text-gray-400">Donate sanitary pads or funds. Every contribution counts.</p>
                     </div>
                 </div>
 
@@ -737,14 +737,22 @@ function loginUser() {
 
     loader.classList.remove("hidden")
 
-    // Simulated authentication
-    setTimeout(() => {
-        loader.classList.add("hidden")
+    fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    }).then(r => r.json().then(j => ({ ok: r.ok, status: r.status, body: j }))).then(resp => {
+        loader.classList.add('hidden')
+        if (!resp.ok) return alert(resp.body && resp.body.error ? resp.body.error : 'Login failed')
 
-        // SHOW MAIN SITE
-        document.getElementById("login-screen").classList.add("hidden")
-        document.getElementById("main-site").classList.remove("hidden")
-    }, 2000)
+        // Successful login — show main site
+        document.getElementById('login-screen').classList.add('hidden')
+        document.getElementById('main-site').classList.remove('hidden')
+    }).catch(err => {
+        loader.classList.add('hidden')
+        console.error(err)
+        alert('Network error')
+    })
 }
 </script>
 <script>
@@ -779,16 +787,27 @@ function registerUser() {
         return
     }
 
-    loader.classList.remove("hidden")
+    loader.classList.remove('hidden')
 
-    setTimeout(() => {
-        loader.classList.add("hidden")
+    fetch('http://localhost:3000/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+    }).then(r => r.json().then(j => ({ ok: r.ok, status: r.status, body: j }))).then(resp => {
+        loader.classList.add('hidden')
+        if (!resp.ok) {
+            return alert(resp.body && resp.body.error ? resp.body.error : 'Registration failed')
+        }
 
-        // Auto login after register
-        document.getElementById("register-modal").classList.add("hidden")
-        document.getElementById("login-screen").classList.add("hidden")
-        document.getElementById("main-site").classList.remove("hidden")
-    }, 2000)
+        // Auto login after successful register
+        document.getElementById('register-modal').classList.add('hidden')
+        document.getElementById('login-screen').classList.add('hidden')
+        document.getElementById('main-site').classList.remove('hidden')
+    }).catch(err => {
+        loader.classList.add('hidden')
+        console.error(err)
+        alert('Network error')
+    })
 }
 </script>
 <script>
