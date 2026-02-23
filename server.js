@@ -16,10 +16,45 @@ const MPESA_CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET || '';
 app.use(cors());
 app.use(bodyParser.json());
 
-// Connect to MongoDB
-mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+// Connect to MongoDB with retry and detailed logging
+function maskUri(uri) {
+  try {
+    // Try to hide credentials and only show host/DB
+    const cleaned = uri.replace(/^mongodb\+srv:\/\//, 'http://').replace(/^mongodb:\/\//, 'http://');
+    const u = new URL(cleaned);
+    const db = (u.pathname || '').replace('/', '');
+    return `${u.protocol}//${u.hostname}${u.port ? ':' + u.port : ''}/${db}`;
+  } catch (e) {
+    return uri.replace(/\/\/.*@/, '//***:***@');
+  }
+}
+
+const maxRetries = 5;
+let attempts = 0;
+async function connectWithRetry() {
+  attempts++;
+  console.log(`MongoDB: attempting connection (${attempts}/${maxRetries}) to ${maskUri(MONGODB_URI)}`);
+  try {
+    await mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, serverSelectionTimeoutMS: 5000 });
+    console.log('MongoDB connected');
+  } catch (err) {
+    console.error(`MongoDB connection error (attempt ${attempts}):`, err && err.message ? err.message : err);
+    if (attempts < maxRetries) {
+      const delay = attempts * 2000;
+      console.log(`Retrying connection in ${delay}ms`);
+      setTimeout(connectWithRetry, delay);
+    } else {
+      console.error('MongoDB: max connection attempts reached. Application may not function properly.');
+    }
+  }
+}
+connectWithRetry();
+
+mongoose.connection.on('disconnected', () => console.warn('MongoDB disconnected'));
+mongoose.connection.on('reconnected', () => console.log('MongoDB reconnected'));
+mongoose.connection.on('error', err => console.error('MongoDB connection error:', err));
+
+process.on('SIGINT', async () => { try { await mongoose.disconnect(); } catch(e){} process.exit(0); });
 
 // Define User schema with unique email
 const userSchema = new mongoose.Schema({
