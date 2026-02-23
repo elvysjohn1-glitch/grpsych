@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
@@ -15,6 +16,12 @@ const MPESA_CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET || '';
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// Serve static site files (psych.html, contribute.html, luna.html, etc.)
+app.use(express.static(path.join(__dirname)));
+
+// Root route -> serve home page
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'psych.html')));
 
 // Connect to MongoDB
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
