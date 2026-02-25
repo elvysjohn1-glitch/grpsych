@@ -1,0 +1,23 @@
+/* Minimal fallback styles for Luna page */
+:root{
+  --primary-600:#2563eb;
+}
+html,body{height:100%;margin:0;padding:0}
+body{background:#f9fafb;color:#111;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+.container{max-width:1024px;margin:0 auto;padding:0 1rem}
+.bg-primary-600{background-color:var(--primary-600)!important}
+.text-left{text-align:left}
+.text-right{text-align:right}
+.rounded-lg{border-radius:0.5rem}
+.border{border:1px solid #e5e7eb}
+.p-4{padding:1rem}
+.p-6{padding:1.5rem}
+.p-8{padding:2rem}
+.mt-4{margin-top:1rem}
+.shadow{box-shadow:0 4px 12px rgba(0,0,0,0.05)}
+input{outline:none}
+#chat{background:transparent}
+/* Simple responsive utility */
+@media (prefers-color-scheme:dark){
+  body{background:#0f172a;color:#e6eef8}
+}
