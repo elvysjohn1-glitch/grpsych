@@ -60,6 +60,48 @@
         </div>
     </div>
 </div>
+<script>
+function loadRecipients(){
+    const recipients = JSON.parse(localStorage.getItem("recipients")) || [];
+
+    const urgentContainer = document.getElementById("urgentContainer");
+    const standardContainer = document.getElementById("standardContainer");
+
+    urgentContainer.innerHTML = "";
+    standardContainer.innerHTML = "";
+
+    recipients.forEach(r => {
+
+        const card = `
+        <div class="${r.urgency === 'urgent' ? 
+            'bg-red-50 border-l-4 border-red-600' : 
+            'bg-teal-50 border-l-4 border-teal-600'} 
+            p-6 rounded-lg shadow">
+
+            <h3 class="text-xl font-bold text-gray-800 mb-2">${r.name}</h3>
+            <p class="text-gray-700 mb-2"><strong>Location:</strong> ${r.location}</p>
+            <p class="text-gray-700 mb-4"><strong>Need:</strong> ${r.need}</p>
+
+            <a href="contribution.html?recipient=${r.name}" 
+               class="${r.urgency === 'urgent' ? 
+               'bg-red-600 hover:bg-red-700' : 
+               'bg-teal-600 hover:bg-teal-700'} 
+               text-white px-4 py-2 rounded inline-block">
+               Contribute Now
+            </a>
+        </div>
+        `;
+
+        if(r.urgency === "urgent"){
+            urgentContainer.innerHTML += card;
+        } else {
+            standardContainer.innerHTML += card;
+        }
+    });
+}
+
+loadRecipients();
+</script>
 
 </body>
 </html>
